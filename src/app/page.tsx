@@ -21,14 +21,31 @@ const skills = [
 ];
 
 const TYPED_TEXT = "Hi, I'm Sarani Tang!";
+const TITLE_TEXT = "Front-End Developer & UX/UI Designer";
 
 const MORPH_SCRAMBLE_COLOR = "#E68AAE";
 const MORPH_SETTLED_COLOR = "#A94E71";
 const MORPH_GLOW = "rgba(230, 138, 174, 0.35)";
 const MORPH_CHARS = "!<>-_\\/[]{}—=+*^?#________";
 
-function AsciiMorphHeading({text, onComplete}: {text: string; onComplete?: () => void }) {
+function AsciiMorphHeading({
+  text, onComplete, fontSize = "3rem", fontWeight = 400, tag = "h1", display = "block",
+}: {
+  text: string; 
+  onComplete?: () => void; 
+  fontSize?: string; 
+  fontWeight?: number; 
+  tag?: "h1" | "h2"; 
+  display?: "block" | "inline-block"
+}) {
+
   const containerRef = useRef<HTMLHeadingElement>(null);
+  const onCompleteRef = useRef(onComplete);
+  const Tag = tag;
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -46,7 +63,7 @@ function AsciiMorphHeading({text, onComplete}: {text: string; onComplete?: () =>
         span.style.minWidth = letter === " " ? "0.3em" : "auto";
         container.appendChild(span);
       });
-      onComplete?.();
+      onCompleteRef.current?.();
       return;
     }
 
@@ -70,7 +87,7 @@ function AsciiMorphHeading({text, onComplete}: {text: string; onComplete?: () =>
  
       const startTimer = setTimeout(() => {
         const interval = setInterval(() => {
-          if (iterations < 10) {
+          if (iterations < 8) {
             span.textContent = MORPH_CHARS[Math.floor(Math.random() * MORPH_CHARS.length)];
             span.style.opacity = "1";
             span.style.color = MORPH_SCRAMBLE_COLOR;
@@ -81,29 +98,30 @@ function AsciiMorphHeading({text, onComplete}: {text: string; onComplete?: () =>
             clearInterval(interval);
           }
           iterations++;
-        }, 50);
+        }, 42);
         intervals.push(interval);
-      }, index * 100);
+      }, index * 75);
       timers.push(startTimer);
   });
 
-  const totalDuration = letters.length * 100 + 10 * 50 + 100;
-    const completeTimer = setTimeout(() => onComplete?.(), totalDuration);
+  const totalDuration = letters.length * 75 + 8 * 42 + 100;
+    const completeTimer = setTimeout(() => onCompleteRef.current?.(), totalDuration);
     timers.push(completeTimer);
  
     return () => {
       timers.forEach(clearTimeout);
       intervals.forEach(clearInterval);
     };
-  }, [text, onComplete]);
+  }, [text]);
 
   return (
-    <h1
+    <Tag
       ref={containerRef}
       style={{
         position: "relative",
-        fontSize: "3rem",
-        fontWeight: 400,
+        display,
+        fontSize,
+        fontWeight,
         fontFamily: "'Inconsolata', monospace",
         letterSpacing: "0.02em",
         minHeight: "1.2em",
@@ -117,6 +135,7 @@ export default function Home() {
     const [active, setActive] = useState("Home");
     const [scrolled, setScrolled] = useState(false);
     const [morphDone, setMorphDone] = useState(false);
+    const [subtitleDone, setSubtitleDone] = useState(false);
 
     useEffect(() => {
       const handleScroll = () => {
@@ -209,8 +228,8 @@ export default function Home() {
    
           .typed-cursor {
             display: inline-block;
-            width: 3px;
-            height: 0.85em;
+            width: 1px;
+            height: 1.05em;
             background: #E68AAE;
             margin-left: 4px;
             vertical-align: text-bottom;
@@ -277,17 +296,30 @@ export default function Home() {
  
           <div style={{ position: "relative", flex: "1 1 480px", maxWidth: "600px", textAlign: "left" }}>
             <AsciiMorphHeading text={TYPED_TEXT} onComplete={() => setMorphDone(true)} />
-            <span className="typed-cursor" style={{ opacity: morphDone ? 1 : 0 }} />
+              {morphDone && (
+                <>
+                  <AsciiMorphHeading
+                    text={TITLE_TEXT}
+                    tag="h2"
+                    fontSize="1.3rem"
+                    fontWeight={300}
+                    display="inline-block"
+                    onComplete={() => setSubtitleDone(true)}
+                  />
+
+                  <span className="typed-cursor" style={{ visibility: subtitleDone ? "visible" : "hidden", fontSize: "1.3rem" }}/>
+                </>
+              )}
           </div>
  
-          {/* Placeholder for your photo — swap this div for an <img src="..." /> or next/image */}
+          {/* Placeholder for my photo — swap this div for an <img src="..." /> or next/image */}
           <div
             className="hero-image-placeholder"
             style={{
               position: "relative",
-              flex: "0 0 320px",
-              width: "320px",
-              height: "320px",
+              flex: "0 0 220px",
+              width: "220px",
+              height: "220px",
               borderRadius: "1rem",
               border: "2px dashed #F3B9CF",
               background: "#FFF4F8",
@@ -307,12 +339,16 @@ export default function Home() {
           <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "50px 20vw" }}></div>
 
           {/* About */}
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>About</h2>
+
           <section id="about" style={{margin: "20px 0", borderRadius: "0.5rem", background: "#F2F2F2", padding: "1rem"}}>
             <div style={{ margin: "5px 0", borderRadius: "0.5rem", background: "#F2F2F2", padding: "1rem" }}>
               <p style={{ fontSize: "1rem", fontWeight: 300, fontFamily: "'Inconsolata', monospace", margin: 0 }}>
-                Hello! I'm Sarani (<i>"sarah-knee"</i>), a recent CSULB graduate focused on{" "}
-                <strong style={{ fontWeight: 500 }}>front-end development</strong> and{" "}
-                <strong style={{ fontWeight: 500 }}>UX/UI design</strong>.
+                Hello! I'm Sarani (<i>"sarah-knee"</i>), a {" "}
+                <strong style={{ fontWeight: 500 }}>front-end developer</strong> and{" "}
+                who genuinely loves making things look and feel great. I recently earned my B.S. in Computer Science and I've been channeling that foundation into 
+                <strong style={{ fontWeight: 500 }}> UX/UI design </strong>and 
+                <strong style={{ fontWeight: 500 }}> front-end development </strong> ever since.
                 I create intuitive interfaces that balance clarity, performance, and thoughtful design.
               </p>
             </div>
@@ -325,6 +361,16 @@ export default function Home() {
             </div>
           </section>
 
+          {/* Skills */}
+          <div style={{ margin: "20px 0", paddingBottom: "30px"}}>
+            {/*<h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>Skills</h2>*/}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", justifyContent: "center" }}>
+              {skills.map((skill) => (
+                <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
+              ))}
+            </div>
+          </div>
+
           {/* Projects */}
           <section id="projects" style={{ minHeight: "100vh", paddingTop: "2rem"}}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>Projects</h2>
@@ -334,19 +380,6 @@ export default function Home() {
           <section id="contact" style={{ minHeight: "100vh", paddingTop: "2rem"}}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>Contact Me!</h2>
           </section>
-
-
-          {/* Skills */}
-          {/*<div style={{ margin: "20px 0", paddingBottom: "30px", borderBottom: "0.5px solid #656565" }}>
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>
-              Skills
-            </h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", justifyContent: "center" }}>
-              {skills.map((skill) => (
-                <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
-              ))}
-            </div>
-          </div>*/}
 
         </div>
       </div>
@@ -373,7 +406,7 @@ function SkillBubble({ icon, label }: { icon: string; label: string }) {
       onMouseEnter={(e) => {
         const el = e.currentTarget;
         el.style.transform = "translateY(-6px)";
-        el.style.borderColor = "lightpink";
+        el.style.borderColor = "#E68AAE";
         el.style.boxShadow = "0 8px 24px rgba(245, 161, 161, 0.8)";
       }}
       onMouseLeave={(e) => {
