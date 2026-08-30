@@ -5,7 +5,6 @@ const navLinks = [
   { label: "Home", href:"#home", icon:"ti-home"},
   { label: "About", href:"#about", icon:"ti-user"},
   { label: "Projects", href:"#projects", icon:"ti-layout-grid"},
-  { label: "Contact Me!", href:"#contact", icon:"ti-mail"},
 ];
 
 const skills = [
@@ -23,9 +22,9 @@ const skills = [
 const TYPED_TEXT = "Hi, I'm Sarani Tang!";
 const TITLE_TEXT = "Front-End Developer & UX/UI Designer";
 
-const MORPH_SCRAMBLE_COLOR = "#E68AAE";
-const MORPH_SETTLED_COLOR = "#A94E71";
-const MORPH_GLOW = "rgba(230, 138, 174, 0.35)";
+const MORPH_SCRAMBLE_COLOR = "var(--color-brand-pink)";
+const MORPH_SETTLED_COLOR = "var(--color-brand-pink-dark)";
+const MORPH_GLOW = "var(--brand-pink-glow)";
 const MORPH_CHARS = "!<>-_\\/[]{}—=+*^?#________";
 
 function AsciiMorphHeading({
@@ -117,13 +116,11 @@ function AsciiMorphHeading({
   return (
     <Tag
       ref={containerRef}
+      className="relative font-display tracking-[0.02em]"
       style={{
-        position: "relative",
         display,
         fontSize,
         fontWeight,
-        fontFamily: "'Inconsolata', monospace",
-        letterSpacing: "0.02em",
         minHeight: "1.2em",
         textShadow: `0 0 15px ${MORPH_GLOW}`,
       }}
@@ -161,210 +158,100 @@ export default function Home() {
 
     return (
       <>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@300;400;500&display=swap');
-   
-          .top-nav {
-            position: fixed;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
-            transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
-          }
-   
-          .top-nav.scrolled {
-            background: rgba(255, 255, 255, 0.75);
-            border-color: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-          }
-   
-          .top-nav-link {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-family: 'Inconsolata', monospace;
-            font-size: 0.88rem;
-            font-weight: 400;
-            color: #555;
-            padding: 6px 14px;
-            border-radius: 999px;
-            transition: color 0.2s, background 0.2s;
-            white-space: nowrap;
-          }
-   
-          .top-nav-link:hover {
-            color: #1a1a1a;
-            background: rgba(0, 0, 0, 0.05);
-          }
-   
-          .top-nav-link.active {
-            color: #A94E71;
-            background: rgba(233, 138, 174, 0.12);
-            font-weight: 500;
-          }
-   
-          .home-dots {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(#F3B9CF 1px, transparent 1px);
-            background-size: 24px 24px;
-            -webkit-mask-image: radial-gradient(circle at 15% 25%, black, transparent 65%);
-            mask-image: radial-gradient(circle at 15% 25%, black, transparent 65%);
-            opacity: 0.8;
-            pointer-events: none;
-          }
-   
-          .typed-cursor {
-            display: inline-block;
-            width: 1px;
-            height: 1.05em;
-            background: #E68AAE;
-            margin-left: 4px;
-            vertical-align: text-bottom;
-            animation: cursor-blink 0.9s step-end infinite;
-          }
-   
-          @keyframes cursor-blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-          }
-   
-          @media (prefers-reduced-motion: reduce) {
-            .typed-cursor { animation: none; }
-          }
- 
-          @media (max-width: 800px) {
-            .hero-row {
-              flex-direction: column-reverse;
-              justify-content: center;
-              gap: 2rem;
-              padding: 0 6vw !important;
-            }
-            .hero-image-placeholder {
-              width: 220px !important;
-              height: 220px !important;
-              flex-basis: auto !important;
-            }
-          }
- 
-          section[id] {
-            scroll-margin-top: 90px;
-          }
-        `}</style>
-
       {/* Navigation Bar */}
-      <nav className={`top-nav${scrolled ? " scrolled" : ""}`} role="navigation" aria-label="Page navigation">
-        {navLinks.map(({label, href}) => (
+      <nav
+        role="navigation"
+        aria-label="Page navigation"
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-1 px-3 py-2 rounded-full border transition duration-300 ${
+          scrolled
+            ? "bg-white/75 border-black/10 backdrop-blur-2xl shadow-[0_2px_20px_rgba(0,0,0,0.08)]"
+            : "bg-white/15 border-black/[0.06] backdrop-blur-none"
+        }`}
+      >
+        {navLinks.map(({ label, href }) => (
           <button
             key={label}
-            className={`top-nav-link${active === label ? " active" : ""}`}
             onClick={() => handleClick(href)}
             aria-current={active === label ? "page" : undefined}
-          >{label}</button>
+            className={`border-none cursor-pointer font-display text-sm px-3.5 py-1.5 rounded-full whitespace-nowrap transition-colors duration-200 ${
+              active === label
+                ? "text-brand-pink-dark bg-brand-pink/[0.12] font-medium"
+                : "text-[#555555] font-normal"
+            }`}
+          >
+            {label}
+          </button>
         ))}
       </nav>
 
-      <div style={{ background: "#ffffff", color: "#1a1a1a", fontFamily: "'Inconsolata', monospace", fontWeight: 300, minHeight: "100vh" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
+      <div className="min-h-screen bg-white text-[#1a1a1a] font-display font-light">
+        <div className="max-w-[1200px] mx-auto p-5">
           {/* Home */}
           <section
-          id="home"
-          className="hero-row"
-          style={{
-            position: "relative",
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "4rem",
-            padding: "0 8vw",
-          }}
-        >
-          <div className="home-dots" />
+            id="home"
+            className="relative min-h-screen flex flex-col-reverse md:flex-row items-center justify-center md:justify-between gap-8 md:gap-16 px-[6vw] md:px-[8vw]"
+            >
+              <div className="dot-grid absolute inset-0 opacity-80 pointer-events-none"/>
+              <div className="relative flex-1_1_480px] max-w-[600px] text-left">
+
+                <AsciiMorphHeading text={TYPED_TEXT} onComplete={() => setMorphDone(true)} />
+                  {morphDone && (
+                    <>
+                      <AsciiMorphHeading
+                        text={TITLE_TEXT}
+                        tag="h2"
+                        fontSize="1.3rem"
+                        fontWeight={300}
+                        display="inline-block"
+                        onComplete={() => setSubtitleDone(true)}
+                      />
+    
+                      <span
+                        className={`typed-cursor inline-block w-px bg-brand-pink ml-1 align-text-bottom ${
+                          subtitleDone ? "visible" : "invisible"
+                        }`}
+                        style={{ height: "1.05em" }}
+                      />
+                    </>
+                  )}
+              </div>
+
+              {/* placeholder for picture of me */}
+              <div className="relative flex-none w-[220px] h-[220px] rounded-2xl border-2 border-dashed border-brand-pink-light bg-brand-pink-pale flex items-center justify-center text-brand-pink-dark text-sm text-center p-4">
+              my photo here
+            </div>
+            </section>
+
+            <div className="max-w-[1200px] mx-auto py-[50px] px-[20vw]" />
+
+            {/* About */}
+          <h2 className="text-2xl font-normal">About</h2>
  
-          <div style={{ position: "relative", flex: "1 1 480px", maxWidth: "600px", textAlign: "left" }}>
-            <AsciiMorphHeading text={TYPED_TEXT} onComplete={() => setMorphDone(true)} />
-              {morphDone && (
-                <>
-                  <AsciiMorphHeading
-                    text={TITLE_TEXT}
-                    tag="h2"
-                    fontSize="1.3rem"
-                    fontWeight={300}
-                    display="inline-block"
-                    onComplete={() => setSubtitleDone(true)}
-                  />
-
-                  <span className="typed-cursor" style={{ visibility: subtitleDone ? "visible" : "hidden", fontSize: "1.3rem" }}/>
-                </>
-              )}
-          </div>
- 
-          {/* Placeholder for my photo — swap this div for an <img src="..." /> or next/image */}
-          <div
-            className="hero-image-placeholder"
-            style={{
-              position: "relative",
-              flex: "0 0 220px",
-              width: "220px",
-              height: "220px",
-              borderRadius: "1rem",
-              border: "2px dashed #F3B9CF",
-              background: "#FFF4F8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#A94E71",
-              fontSize: "0.9rem",
-              textAlign: "center",
-              padding: "1rem",
-            }}
-          >
-            Drop your image here
-          </div>
-        </section>
-
-          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "50px 20vw" }}></div>
-
-          {/* About */}
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>About</h2>
-
-          <section id="about" style={{margin: "20px 0", borderRadius: "0.5rem", background: "#F2F2F2", padding: "1rem"}}>
-            <div style={{ margin: "5px 0", borderRadius: "0.5rem", background: "#F2F2F2", padding: "1rem" }}>
-              <p style={{ fontSize: "1rem", fontWeight: 300, fontFamily: "'Inconsolata', monospace", margin: 0 }}>
-                Hello! I'm Sarani (<i>"sarah-knee"</i>), a {" "}
-                <strong style={{ fontWeight: 500 }}>front-end developer</strong> and{" "}
-                who genuinely loves making things look and feel great. I recently earned my B.S. in Computer Science and I've been channeling that foundation into 
-                <strong style={{ fontWeight: 500 }}> UX/UI design </strong>and 
-                <strong style={{ fontWeight: 500 }}> front-end development </strong> ever since.
-                I create intuitive interfaces that balance clarity, performance, and thoughtful design.
+          <section id="about" className="my-5 rounded-lg bg-brand-gray p-4">
+            <div className="my-1 rounded-lg bg-brand-gray p-4">
+              <p className="m-0 text-base font-light">
+                Hello! I'm Sarani (<i>"sarah-knee"</i>), a{" "}
+                <strong className="font-medium">front-end developer</strong> and{" "}
+                who genuinely loves making things look and feel great. I recently earned my
+                B.S. in Computer Science and I've been channeling that foundation into
+                <strong className="font-medium"> UX/UI design </strong>and
+                <strong className="font-medium"> front-end development </strong> ever since.
+                I create intuitive interfaces that balance clarity, performance, and
+                thoughtful design.
               </p>
             </div>
 
             {/* Hobbies */}
-            <div style={{ margin: "5px 0", borderRadius: "0.5rem", padding: "1rem" }}>
-              <p style={{ fontSize: "1rem", fontWeight: 300, fontFamily: "'Inconsolata', monospace" }}>
+            <div className="my-1 rounded-lg p-4">
+              <p className="text-base font-light">
                 Outside of coding, I enjoy working out, bouldering, reading, and gaming!
               </p>
             </div>
           </section>
 
           {/* Skills */}
-          <div style={{ margin: "20px 0", paddingBottom: "30px"}}>
-            {/*<h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>Skills</h2>*/}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", justifyContent: "center" }}>
+          <div className="my-5 pb-[30px]">
+            <div className="flex flex-wrap gap-5 justify-center">
               {skills.map((skill) => (
                 <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
               ))}
@@ -372,15 +259,10 @@ export default function Home() {
           </div>
 
           {/* Projects */}
-          <section id="projects" style={{ minHeight: "100vh", paddingTop: "2rem"}}>
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>Projects</h2>
+          <section id="projects" className="min-h-screen pt-8">
+            <h2 className="text-2xl font-normal">Projects</h2>
           </section>
-
-          {/* Contact Me */}
-          <section id="contact" style={{ minHeight: "100vh", paddingTop: "2rem"}}>
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>Contact Me!</h2>
-          </section>
-
+        
         </div>
       </div>
     </>
@@ -389,37 +271,9 @@ export default function Home() {
 
 function SkillBubble({ icon, label }: { icon: string; label: string }) {
   return (
-    <div
-      className="skill-bubble"
-      style={{
-        border: "1px solid #ccc",
-        borderRadius: "20px",
-        padding: "1rem",
-        height: "20px",
-        display: "flex",
-        alignItems: "center",
-        gap: "0.6rem",
-        width: "fit-content",
-        cursor: "default",
-        transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget;
-        el.style.transform = "translateY(-6px)";
-        el.style.borderColor = "#E68AAE";
-        el.style.boxShadow = "0 8px 24px rgba(245, 161, 161, 0.8)";
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget;
-        el.style.transform = "translateY(0)";
-        el.style.borderColor = "#ccc";
-        el.style.boxShadow = "none";
-      }}
-    >
-      <i className={icon} style={{ fontSize: "1.5rem" }}></i>
-      <span style={{ color: "#696969", fontSize: "1rem", fontWeight: 400, fontFamily: "'Inconsolata', monospace" }}>
-        {label}
-      </span>
+    <div className="flex items-center gap-2.5 w-fit h-5 px-4 py-4 rounded-[20px] border border-brand-border cursor-default transition-all duration-200 hover:-translate-y-1.5 hover:border-brand-pink hover:shadow-[0_8px_24px_rgba(245,161,161,0.8)]">
+      <i className={icon} style={{ fontSize: "1.5rem" }} />
+      <span className="text-brand-gray-text text-base font-normal">{label}</span>
     </div>
   );
 }
