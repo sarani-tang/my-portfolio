@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef} from "react";
+import type { ReactNode } from "react";
 
 const navLinks = [
   { label: "Home", href:"#home", icon:"ti-home"},
@@ -18,6 +19,19 @@ const skills = [
   { icon: "devicon-python-plain colored", label: "Python" },
   { icon: "devicon-java-plain colored", label: "Java" },
 ];
+
+const socialLinks = [
+  {
+    label: "LinkedIn",
+    href: "linkedin.com/in/sarani-tang-05b445375",
+    icon: "devicon-linkedin-plain",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/sarani-tang",
+    icon: "devicon-github-original",
+  },
+]
 
 const TYPED_TEXT = "Hi, I'm Sarani Tang!";
 const TITLE_TEXT = "Front-End Developer & UX/UI Designer";
@@ -133,6 +147,13 @@ export default function Home() {
     const [scrolled, setScrolled] = useState(false);
     const [morphDone, setMorphDone] = useState(false);
     const [subtitleDone, setSubtitleDone] = useState(false);
+    const [socialVisible, setSocialVisible] = useState(false);
+
+    useEffect(() => {
+      if (!subtitleDone) return;
+      const timer = setTimeout(() => setSocialVisible(true), 350);
+      return () => clearTimeout(timer);
+    }, [subtitleDone]);
 
     useEffect(() => {
       const handleScroll = () => {
@@ -194,7 +215,9 @@ export default function Home() {
               <div className="dot-grid absolute inset-0 opacity-80 pointer-events-none"/>
               <div className="relative flex-1_1_480px] max-w-[600px] text-left">
 
+                {/* Ascii Animation */}
                 <AsciiMorphHeading text={TYPED_TEXT} onComplete={() => setMorphDone(true)} />
+
                   {morphDone && (
                     <>
                       <AsciiMorphHeading
@@ -212,6 +235,42 @@ export default function Home() {
                         }`}
                         style={{ height: "1.05em" }}
                       />
+
+                      {socialVisible && (
+                        <div className="flex items-center gap-4 mt-5">
+                          {socialLinks.map(({ label, href, icon }, index) => (
+                            <SocialLink
+                              key={label}
+                              href={href}
+                              label={label}
+                              delay={index * 120}
+                            >
+                              <i className={icon} />
+                            </SocialLink>
+                          ))}
+                          <SocialLink
+                            href="/Users/saranitang/my-portfolio/public/assets/saranis-resume.pdf"
+                            label="Resume"
+                            delay={socialLinks.length * 120}
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.0"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              width="1em"
+                              height="1em"
+                            >
+                              <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+                              <path d="M7.5 9h9" />
+                              <path d="M7.5 13h9" />
+                              <path d="M7.5 17h5.5" />
+                            </svg>
+                          </SocialLink>
+                        </div>
+                      )}
                     </>
                   )}
               </div>
@@ -225,47 +284,70 @@ export default function Home() {
             <div className="max-w-[1200px] mx-auto py-[50px] px-[20vw]" />
 
             {/* About */}
-          <h2 className="text-2xl font-normal">About</h2>
+            <h2 className="text-2xl font-normal">About</h2>
  
-          <section id="about" className="my-5 rounded-lg bg-brand-gray p-4">
-            <div className="my-1 rounded-lg bg-brand-gray p-4">
-              <p className="m-0 text-base font-light">
-                Hello! I'm Sarani (<i>"sarah-knee"</i>), a{" "}
-                <strong className="font-medium">front-end developer</strong> and{" "}
-                who genuinely loves making things look and feel great. I recently earned my
-                B.S. in Computer Science and I've been channeling that foundation into
-                <strong className="font-medium"> UX/UI design </strong>and
-                <strong className="font-medium"> front-end development </strong> ever since.
-                I create intuitive interfaces that balance clarity, performance, and
-                thoughtful design.
-              </p>
+            <section id="about" className="my-5 rounded-lg bg-brand-gray p-4">
+              <div className="my-1 rounded-lg bg-brand-gray p-4">
+                <p className="m-0 text-base font-light">
+                  Hello! I'm Sarani (<i>"sarah-knee"</i>), a{" "}
+                  <strong className="font-medium">front-end developer</strong> and{" "}
+                  who genuinely loves making things look and feel great. I recently earned my
+                  B.S. in Computer Science and I've been channeling that foundation into
+                  <strong className="font-medium"> UX/UI design </strong>and
+                  <strong className="font-medium"> front-end development </strong> ever since.
+                  I create intuitive interfaces that balance clarity, performance, and
+                  thoughtful design.
+                </p>
+              </div>
+
+              {/* Hobbies */}
+              <div className="my-1 rounded-lg p-4">
+                <p className="text-base font-light">
+                  Outside of coding, I enjoy working out, bouldering, reading, and gaming!
+                </p>
+              </div>
+            </section>
+
+            {/* Skills */}
+            <div className="my-5 pb-[30px]">
+              <div className="flex flex-wrap gap-5 justify-center">
+                {skills.map((skill) => (
+                  <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
+                ))}
+              </div>
             </div>
 
-            {/* Hobbies */}
-            <div className="my-1 rounded-lg p-4">
-              <p className="text-base font-light">
-                Outside of coding, I enjoy working out, bouldering, reading, and gaming!
-              </p>
-            </div>
-          </section>
-
-          {/* Skills */}
-          <div className="my-5 pb-[30px]">
-            <div className="flex flex-wrap gap-5 justify-center">
-              {skills.map((skill) => (
-                <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
-              ))}
-            </div>
-          </div>
-
-          {/* Projects */}
-          <section id="projects" className="min-h-screen pt-8">
-            <h2 className="text-2xl font-normal">Projects</h2>
-          </section>
-        
+            {/* Projects */}
+            <section id="projects" className="min-h-screen pt-8">
+              <h2 className="text-2xl font-normal">Projects</h2>
+            </section>
+          
         </div>
       </div>
     </>
+  );
+}
+
+function SocialLink({
+  href, label, children, delay = 0,
+}: {
+  href: string;
+  label: string;
+  children: ReactNode;
+  delay?: number;
+}) {
+  return (
+    <a 
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      title={label}
+      className="flex items-center justify-center w-10 h-10 rounded-xl border border-brand-border text-brand-pink-dark text-xl transition-all duration-200 opacity-0 animate-fade-in-up hover:-translate-y-1 hover:border-brand-pink hover:text-brand-pink hover:shadow-[0_8px_20px_rgba(245,161,161,0.6)]"
+      style={{ animationDelay: `${delay}ms`}}
+    >
+      {children}
+    </a>
   );
 }
 
