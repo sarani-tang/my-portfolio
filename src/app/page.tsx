@@ -23,7 +23,7 @@ const skills = [
 const socialLinks = [
   {
     label: "LinkedIn",
-    href: "linkedin.com/in/sarani-tang-05b445375",
+    href: "https://linkedin.com/in/sarani-tang-05b445375",
     icon: "devicon-linkedin-plain",
   },
   {
@@ -243,15 +243,18 @@ export default function Home() {
                               key={label}
                               href={href}
                               label={label}
+                              visible={socialVisible}
                               delay={index * 120}
                             >
                               <i className={icon} />
                             </SocialLink>
                           ))}
                           <SocialLink
-                            href="/Users/saranitang/my-portfolio/public/assets/saranis-resume.pdf"
+                            href="/assets/saranis-resume.pdf"
                             label="Resume"
+                            visible={socialVisible}
                             delay={socialLinks.length * 120}
+                            download="saranis-resume.pdf"
                           >
                             <svg
                               viewBox="0 0 24 24"
@@ -276,9 +279,13 @@ export default function Home() {
               </div>
 
               {/* placeholder for picture of me */}
-              <div className="relative flex-none w-[220px] h-[220px] rounded-2xl border-2 border-dashed border-brand-pink-light bg-brand-pink-pale flex items-center justify-center text-brand-pink-dark text-sm text-center p-4">
-              my photo here
-            </div>
+              <div className="relative flex-none w-[300px] h-[300px] rounded-full bg-brand-pink-pale flex items-center justify-center text-brand-pink-dark text-sm text-center">
+                <img
+                  src="/assets/grad-pic.png"
+                  alt="Sarani's graduation picture"
+                  className="w-full h-full object-cover rounded-full border-4 border-double border-brand-pink-light"
+                />
+              </div>
             </section>
 
             <div className="max-w-[1200px] mx-auto py-[50px] px-[20vw]" />
@@ -329,25 +336,37 @@ export default function Home() {
 }
 
 function SocialLink({
-  href, label, children, delay = 0,
+  href, label, children, visible = true, delay = 0, download,
 }: {
   href: string;
   label: string;
   children: ReactNode;
+  visible?: boolean;
   delay?: number;
+  download?: string;
 }) {
   return (
-    <a 
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      title={label}
-      className="flex items-center justify-center w-10 h-10 rounded-xl border border-brand-border text-brand-pink-dark text-xl transition-all duration-200 opacity-0 animate-fade-in-up hover:-translate-y-1 hover:border-brand-pink hover:text-brand-pink hover:shadow-[0_8px_20px_rgba(245,161,161,0.6)]"
-      style={{ animationDelay: `${delay}ms`}}
-    >
-      {children}
-    </a>
+    <div
+      className= {`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
+      ${
+        visible
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-2 pointer-events-none"
+      }`}
+      style={{ transitionDelay: visible ? `${delay}ms` : "0ms"}}
+      >
+      <a 
+        href={href}
+        {...(download
+          ? { download }
+          : { target: "_blank", rel: "noopener noreferrer"})}
+        aria-label={label}
+        title={label}
+        className="flex items-center justify-center w-10 h-10 rounded-xl border border-brand-border text-brand-pink-dark text-xl transition-all duration-200 hover:-translate-y-1 hover:border-brand-pink hover:text-brand-pink hover:shadow-[0_8px_20px_rgba(245,161,161,0.6)]"
+      >
+        {children}
+      </a>
+    </div>
   );
 }
 
