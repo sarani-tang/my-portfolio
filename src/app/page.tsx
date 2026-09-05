@@ -290,11 +290,13 @@ export default function Home() {
 
             <div className="max-w-[1200px] mx-auto py-[50px] px-[20vw]" />
 
-            {/* About */}
-            <h2 className="text-2xl font-normal">About</h2>
- 
-            <section id="about" className="my-5 rounded-lg bg-brand-gray p-4">
-              <div className="my-1 rounded-lg bg-brand-gray p-4">
+            {/* About */} 
+            <section id="about" className="my-5 scroll-mt-[90px]">
+            <h2 className="text-2xl font-normal mb-4">About</h2>
+
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* left side */}
+              <div className="flex-[2] rounded-[6rem] bg-brand-gray p-8 md:p-10 text-center flex flex-col items-center justify-center">
                 <p className="m-0 text-base font-light">
                   Hello! I'm Sarani (<i>"sarah-knee"</i>), a{" "}
                   <strong className="font-medium">front-end developer</strong> and{" "}
@@ -305,24 +307,22 @@ export default function Home() {
                   I create intuitive interfaces that balance clarity, performance, and
                   thoughtful design.
                 </p>
-              </div>
 
-              {/* Hobbies */}
-              <div className="my-1 rounded-lg p-4">
-                <p className="text-base font-light">
+                {/* Hobbies */}
+                <p className="text-base font-light mt-4">
                   Outside of coding, I enjoy working out, bouldering, reading, and gaming!
                 </p>
               </div>
-            </section>
 
-            {/* Skills */}
-            <div className="my-5 pb-[30px]">
-              <div className="flex flex-wrap gap-5 justify-center">
+              {/* Skills */}
+              {/* right side */}
+              <div className="flex-1 flex-wrap gap-5 justify-center">
                 {skills.map((skill) => (
                   <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
                 ))}
               </div>
             </div>
+            </section>
 
             {/* Projects */}
             <section id="projects" className="min-h-screen pt-8">
