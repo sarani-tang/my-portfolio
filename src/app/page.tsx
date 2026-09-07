@@ -142,6 +142,170 @@ function AsciiMorphHeading({
   );
 }
 
+// sphere for skills 
+
+const SPHERE_RADIUS = 130; // radius of the point cloud in px
+const BASE_CONTAINER_SIZE = 320; // container size 
+const AUTO_SPIN_SPEED = 0.25; // base rotation speed in rad/sec
+const MAX_SPIN_BOOST = 0.6; // extra speed that's added or substracted by cursor x-position
+const MAX_TILT = 0.5; // max tilt in radians by cursor
+
+type SpherePoint = {x: number; y: number; z: number };
+
+function generateSpherePoints(count: number, radius: number): SpherePoint[] {
+  const points: SpherePoint[] = [];
+  const offset = 2 / count;
+  const increment = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < count; i++) {
+    const y = i * offset - 1 + offset / 2;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const phi = i * increment;
+    points.push({
+      x: Math.cos(phi) * r * radius,
+      y: y * radius,
+      z: Math.sin(phi) * r * radius,
+    });
+  }
+  return points;
+}
+
+function rotatePoint(p: SpherePoint, yaw: number, pitch: number): SpherePoint {
+  const cosY = Math.cos(yaw);
+  const sinY = Math.sin(yaw);
+  const x1 = p.x * cosY + p.z * sinY;
+  const z1 = -p.x * sinY + p.z * cosY;
+ 
+  const cosX = Math.cos(pitch);
+  const sinX = Math.sin(pitch);
+  const y2 = p.y * cosX - z1 * sinX;
+  const z2 = p.y * sinX + z1 * cosX;
+ 
+  return { x: x1, y: y2, z: z2 };
+}
+
+function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number) {
+  const t = (value - inMin) / (inMax - inMin);
+  const clamped = Math.min(1, Math.max(0, t));
+  return outMin + clamped * (outMax - outMin);
+}
+ 
+function SkillSphere({ items }: { items: { icon: string; label: string }[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const bubbleRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const pointsRef = useRef<SpherePoint[]>([]);
+  const scaleFactorRef = useRef(1);
+ 
+  const yawRef = useRef(0);
+  const pitchRef = useRef(0);
+  const targetPitchRef = useRef(0);
+  const spinSpeedRef = useRef(AUTO_SPIN_SPEED);
+  const targetSpinRef = useRef(AUTO_SPIN_SPEED);
+  const pausedRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
+ 
+  useEffect(() => {
+    pointsRef.current = generateSpherePoints(items.length, SPHERE_RADIUS);
+  }, [items.length]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      scaleFactorRef.current = entries[0].contentRect.width / BASE_CONTAINER_SIZE;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+ 
+  const renderFrame = (yaw: number, pitch: number) => {
+    const sf = scaleFactorRef.current;
+    pointsRef.current.forEach((p, i) => {
+      const el = bubbleRefs.current[i];
+      if (!el) return;
+      const rotated = rotatePoint(p, yaw, pitch);
+      const scale = mapRange(rotated.z, -SPHERE_RADIUS, SPHERE_RADIUS, 0.6, 1.15) * sf;
+      const opacity = mapRange(rotated.z, -SPHERE_RADIUS, SPHERE_RADIUS, 0.4, 1);
+      el.style.transform = `translate(calc(-50% + ${rotated.x * sf}px), calc(-50% + ${rotated.y * sf}px)) scale(${scale})`;
+      el.style.opacity = String(opacity);
+      el.style.zIndex = String(Math.round(rotated.z + 1000));
+    });
+  };
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ 
+    if (reduceMotion) {
+      renderFrame(0, 0);
+      const el = containerRef.current;
+      if (!el) return;
+      const ro = new ResizeObserver(() => renderFrame(0, 0));
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+ 
+    const step = (time: number) => {
+      if (lastTimeRef.current === null) lastTimeRef.current = time;
+      const dt = (time - lastTimeRef.current) / 1000;
+      lastTimeRef.current = time;
+ 
+      spinSpeedRef.current += (targetSpinRef.current - spinSpeedRef.current) * 0.05;
+      pitchRef.current += (targetPitchRef.current - pitchRef.current) * 0.08;
+ 
+      if (!pausedRef.current) {
+        yawRef.current += spinSpeedRef.current * dt;
+      }
+ 
+      renderFrame(yawRef.current, pitchRef.current);
+      rafRef.current = requestAnimationFrame(step);
+    };
+ 
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    targetSpinRef.current = AUTO_SPIN_SPEED + nx * MAX_SPIN_BOOST;
+    targetPitchRef.current = -ny * MAX_TILT;
+  };
+ 
+  const handlePointerLeave = () => {
+    targetSpinRef.current = AUTO_SPIN_SPEED;
+    targetPitchRef.current = 0;
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+      className="relative w-full aspect-square max-w-[320px] mx-auto"
+    >
+      {items.map((skill, i) => (
+        <div
+          key={skill.label}
+          ref={(node) => { bubbleRefs.current[i] = node; }}
+          onPointerEnter={() => { pausedRef.current = true; }}
+          onPointerLeave={() => { pausedRef.current = false; }}
+          className="absolute top-1/2 left-1/2 flex items-center gap-2 px-3 py-2 rounded-[20px] border border-brand-border bg-white/70 backdrop-blur-sm cursor-default whitespace-nowrap will-change-transform transition-[border-color,box-shadow] duration-200 hover:border-brand-pink hover:shadow-[0_8px_20px_rgba(245,161,161,0.6)]"
+          style={{ transform: "translate(-50%, -50%) scale(1)" }}
+        >
+          <i className={skill.icon} style={{ fontSize: "1.3rem" }} />
+          <span className="text-brand-gray-text text-sm font-normal">{skill.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
     const [active, setActive] = useState("Home");
     const [scrolled, setScrolled] = useState(false);
@@ -294,7 +458,7 @@ export default function Home() {
             <section id="about" className="my-5 scroll-mt-[90px]">
             <h2 className="text-2xl font-normal mb-4">About</h2>
 
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-8">
               {/* left side */}
               <div className="flex-[2] rounded-[6rem] bg-brand-gray p-8 md:p-10 text-center flex flex-col items-center justify-center">
                 <p className="m-0 text-base font-light">
@@ -317,9 +481,7 @@ export default function Home() {
               {/* Skills */}
               {/* right side */}
               <div className="flex-1 flex-wrap gap-5 justify-center">
-                {skills.map((skill) => (
-                  <SkillBubble key={skill.label} icon={skill.icon} label={skill.label} />
-                ))}
+                <SkillSphere items={skills}/>
               </div>
             </div>
             </section>
